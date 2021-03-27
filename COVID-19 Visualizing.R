@@ -1,65 +1,59 @@
+setwd("C:/Users/Bret/OneDrive/R Projects/CoronaVirus Modelling/")
+
 mydata <- read.csv("COVIDdata.csv",header=TRUE)
 attach(mydata)
 
 library(stringr)
+library(dplyr)
+library(lubridate)
 
 #Canada
 canada <- mydata[which(str_detect(mydata$countriesAndTerritories, "Canada")), ]
-canadasorted <- canada[order(as.Date(canada$ï..dateRep, format="%Y-%m-%d")),]
-canadasorted$new <- cumsum(canadasorted$cases)
-canadasorted$totaldeaths <- cumsum(canadasorted$deaths)
-canDeaths <- as.vector(canadasorted$totaldeaths)
+canadasorted <- canada[nrow(canada):1,]
+date.start <- as.Date("2019-12-31")
+vec.st <- c(year(date.start), month(date.start), day(date.start))
+canadacases <- ts(cumsum(canadasorted$cases), start=vec.st, freq=365)
 
-Dates <- as.Date(canadasorted$ï..dateRep)
-canCases <- as.vector(canadasorted$new)
 
 #USA
 USA <- mydata[which(str_detect(mydata$countriesAndTerritories, "United_States_of_America")), ]
-usasorted <- USA[order(as.Date(USA$ï..dateRep, format="%Y-%m-%d")),]
-usasorted$new <- cumsum(usasorted$cases)
-usasorted$totaldeaths <- cumsum(usasorted$deaths)
-usaCases <- as.vector(usasorted$new)
-usaDeaths <- as.vector(usasorted$totaldeaths)
+USAsorted <- USA[nrow(USA):1,]
+USAcases <- ts(cumsum(USAsorted$cases), start=vec.st, freq=365)
 
 #Italy
 italy <- mydata[which(str_detect(mydata$countriesAndTerritories, "Italy")), ]
-italysorted <- italy[order(as.Date(italy$ï..dateRep, format="%Y-%m-%d")),]
-italysorted$new <- cumsum(italysorted$cases)
-italysorted$totaldeaths <- cumsum(italysorted$deaths)
-italyCases <- as.vector(italysorted$new)
-italyDeaths <- as.vector(italysorted$totaldeaths)
+italysorted <- italy[nrow(italy):1,]
+italycases <- ts(cumsum(italysorted$cases), start=vec.st, freq=365)
 
 #South Korea
 sKorea <- mydata[which(str_detect(mydata$countriesAndTerritories, "South_Korea")), ]
-sKoreasorted <- sKorea[order(as.Date(sKorea$ï..dateRep, format="%Y-%m-%d")),]
-sKoreasorted$new <- cumsum(sKoreasorted$cases)
-sKoreasorted$totaldeaths <- cumsum(sKorea$deaths)
-sKoreaCases <- as.vector(sKoreasorted$new)
-sKoreaDeaths <- as.vector(sKoreasorted$totaldeaths)
+sKoreasorted <- sKorea[nrow(sKorea):1,]
+sKoreacases <- ts(cumsum(sKoreasorted$cases), start=vec.st, freq=365)
 
 #Plotting Cases
-plot(Dates,canCases,
+par(mfrow=c(4,1))
+plot(canadacases,
      pch= 19,
      main="Canadian Cases",
      xlab="Date",
      ylab="Total Cases",
      col="steelblue",
 )
-plot(Dates,usaCases,
+plot(USAcases,
      main="USA Cases",
      pch= 19,
      xlab="Date",
      ylab="Total Cases",
      col="red",
 )
-plot(Dates,italyCases,
+plot(italycases,
      main="Italy Cases",
      pch= 19,
      xlab="Date",
      ylab="Total Cases",
      col="darkgreen",
 )
-plot(Dates,sKoreaCases,
+plot(sKoreacases,
      main="South Korea Cases",
      pch= 19,
      xlab="Date",
@@ -67,34 +61,3 @@ plot(Dates,sKoreaCases,
      col="orange",
 )
 
-
-#--------------------------------------------------------------------------------------
-#Plotting deaths
-plot(Dates,canDeaths,
-     pch= 19,
-     main="Canadian Deaths",
-     xlab="Date",
-     ylab="Total Deaths",
-     col="steelblue",
-)
-plot(Dates,usaDeaths,
-     main="USA Deaths",
-     pch= 19,
-     xlab="Date",
-     ylab="Total Deaths",
-     col="red",
-)
-plot(Dates,italyDeaths,
-     main="Italy Deaths",
-     pch= 19,
-     xlab="Date",
-     ylab="Total Deaths",
-     col="darkgreen",
-)
-plot(Dates,sKoreaDeaths,
-     main="South Korea Deaths",
-     pch= 19,
-     xlab="Date",
-     ylab="Total Deaths",
-     col="orange",
-)
